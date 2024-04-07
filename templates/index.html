@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Toolbox</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='xml.png') }}" alt="XML Tool Logo">
+        </div>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/create_xml">Create XML</a></li>
+            <li><a href="/validate_xml">Validate XML</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>XML Tool</h1>
+        <p>Welcome to the XML Tool.</p>
+        <p>This website allows you to:</p>
+        <ul>
+            <li>Create XML files by filling out a form.</li>
+            <li>Validate existing XML files for correctness.</li>
+        </ul>
+        <p>Choose your desired action from the menu above.</p>
+    </div>
+</body>
+</html>

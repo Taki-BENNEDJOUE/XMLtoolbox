@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create XML</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='create.css') }}"> 
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='xml.png') }}" alt="XML Tool Logo">
+        </div>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/create_xml">Create XML</a></li>
+            <li><a href="/validate_xml">Validate XML</a></li>
+        </ul>
+    </nav>
+    <h1>Enter Book Information</h1>
+    <form action="/create_xml" method="POST">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br>
+
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required><br>
+
+        <label for="isbn">ISBN:</label>
+        <input type="text" id="isbn" name="isbn" required><br>
+
+        <label for="publication_year">Publication Year:</label>
+        <input type="text" id="publication_year" name="publication_year" required><br>
+
+        <button type="submit">Add Book</button>
+        <a href="/download" class="download">Download XML File</a>
+    </form>
+    
+
+    
+    
+</body>
+</html>

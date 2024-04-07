@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Validation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='validate.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='xml.png') }}" alt="XML Tool Logo">
+        </div>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/create_xml">Create XML</a></li>
+            <li><a href="/validate_xml">Validate XML</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>XML Validation</h1>
+        <form id="xmlForm" action="/validate_xml" method="POST" enctype="multipart/form-data">
+            <label for="xml_file">Upload XML File:</label>
+            <input type="file" id="xml_file" name="xml_file" accept=".xml" required><br>
+            
+            <label for="validation_method">Validation Method:</label>
+            <select id="validation_method" name="validation_method" required>
+                <option value="dtd">DTD</option>
+                <option value="xsd">XSD</option>
+            </select><br>
+    
+            <button type="submit">Validate XML</button>
+        </form>
+        <div id="validation_result">
+            {% if message %}
+                <p>{{ message }}</p>
+            {% endif %}
+        </div>
+        {% if xml_content %}
+        <div id="xml_content_display">
+            <h2>XML Content:</h2>
+            <p>Title: {{ xml_content.title }}</p>
+            <p>Author: {{ xml_content.author }}</p>
+            <p>ISBN: {{ xml_content.isbn }}</p>
+            <p>Publication Year: {{ xml_content.publication_year }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
