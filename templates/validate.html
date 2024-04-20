@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XML Validation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xslt.js/2.1.0/xslt.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='validate.css') }}">
+    <link rel="stylesheet" type="text/xsl" href="{{ url_for('static', filename='transform.xslt') }}">
 </head>
 <body>
     <nav class="navbar">
@@ -19,7 +21,7 @@
     </nav>
     <div class="container">
         <h1>XML Validation</h1>
-        <form id="xmlForm" action="/validate_xml" method="POST" enctype="multipart/form-data">
+        <form id="xmlForm" action="/validate_xml" method="POST" enctype="multipart/form-data" >
             <label for="xml_file">Upload XML File:</label>
             <input type="file" id="xml_file" name="xml_file" accept=".xml" required><br>
             
@@ -28,53 +30,48 @@
                 <option value="dtd">DTD</option>
                 <option value="xsd">XSD</option>
             </select><br>
-    
-            <button type="submit">Validate XML</button>
+
+            <button type="submit" >Validate XML</button>
+            
+            
         </form>
+        
         <div id="validation_result">
             {% if message %}
                 <p>{{ message }}</p>
-            {% endif %}  
+                {% if message == 'XML file is valid.' %}
+                    <button id="transformButton">Transform XML</button>
+                    <pre hidden>{{ xml_content }}</pre>
+                {% endif %}
+            {% endif %}
         </div>
+        <div id="transformed-content"></div>
     </div>
-    <div id="transformed-content"></div>
-
     <script>
+  
         function transformXML() {
-            // Get the selected file
-            var fileInput = document.getElementById('xml_file');
-            var file = fileInput.files[0];
+           
+            var xmlContent = document.getElementById('validation_result').querySelector('pre').textContent;
 
-            // Check if a file is selected
-            if (!file) {
-                alert('Please select an XML file.');
-                return false;
-            }
-
-            // Read the file content
-            var reader = new FileReader();
-            reader.onload = function(event) {
-                var xmlContent = event.target.result;
-
-                // Transform XML to HTML using XSLT.js
-                var xsltProcessor = new XSLTProcessor();
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', "{{ url_for('static', filename='transform.xslt') }}", true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        var xsltDoc = xhr.responseXML;
-                        xsltProcessor.importStylesheet(xsltDoc);
-                        var resultDocument = xsltProcessor.transformToDocument(new DOMParser().parseFromString(xmlContent, 'text/xml'));
-                        var transformedHTML = new XMLSerializer().serializeToString(resultDocument);
-                        document.getElementById('transformed-content').innerHTML = transformedHTML;
-                    }
-                };
-                xhr.send();
+            // Transform XML to HTML using XSLT.js
+            var xsltProcessor = new XSLTProcessor();
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', "{{ url_for('static', filename='transform.xslt') }}", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var xsltDoc = xhr.responseXML;
+                    xsltProcessor.importStylesheet(xsltDoc);
+                    var resultDocument = xsltProcessor.transformToDocument(new DOMParser().parseFromString(xmlContent, 'text/xml'));
+                    var transformedHTML = new XMLSerializer().serializeToString(resultDocument);
+                    document.getElementById('transformed-content').innerHTML = transformedHTML;
+                }
             };
-            reader.readAsText(file);
-
-            return false; // Prevent the form from submitting
+            xhr.send();
         }
+        
+        document.getElementById('transformButton').addEventListener('click', function() {
+            transformXML();
+        });
     </script>
 </body>
 </html>

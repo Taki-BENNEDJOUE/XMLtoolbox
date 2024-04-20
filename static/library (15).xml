@@ -1,0 +1,16 @@
+<library>
+    <book id="a43a4076-5ddb-4ad5-9348-fa754dd0294c">
+        <title>ajhs66</title>
+        <author>fhkjdsa</author>
+        <isbn>12345678910</isbn>
+        <publication_year>2010</publication_year>
+        <publisher>tajkl</publisher>
+        <genre>nothings</genre>
+        <reviews>
+            <review>
+                <rating>4</rating>
+                <comment>no now another time nchalah</comment>
+            </review>
+        </reviews>
+    </book>
+</library>

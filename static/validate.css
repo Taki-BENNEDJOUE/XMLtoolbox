@@ -65,7 +65,7 @@ input[type="text"] {
     border-radius: 5px;
 }
 
-button[type="submit"] {
+button {
     width: 40%;
     display: inline-block;
     text-align: center;
@@ -78,7 +78,7 @@ button[type="submit"] {
     transition: background-color 0.3s ease;
 }
 
-button[type="submit"]:hover {
+button:hover {
     background-color: #555;
 }
 

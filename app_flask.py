@@ -7,6 +7,7 @@ import uuid
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -88,34 +89,35 @@ def validate():
         elif validation_method == 'dtd':
             schema_file_path = os.path.join(app.root_path, 'static', 'library.dtd')
             schema = etree.DTD(open(schema_file_path))
+            
+          
 
         # Validate the XML file against the schema
-        validation_result = schema.validate(xml_tree)
-        if validation_result:
-            # Transformation only if XML is valid
-            xslt_file_path = os.path.join(app.root_path, 'static', 'transform.xslt')
-            with open(xslt_file_path, 'rb') as f:
-                xslt_content = f.read()
-            transformed_html = transform_xml(xml_file.read(), xslt_content)
-            return transformed_html
-        else:
-            # If XML is not valid, return error message
-            validation_errors = schema.error_log.filter_from_errors()
-            error_message = "\n".join([error.message for error in validation_errors])
-            return f"XML file is not valid. Errors: {error_message}"
+        schema.assertValid(xml_tree)
+        validation_result = 'XML file is valid.'
+        with open(xml_file_path, 'r') as file:
+            xml_content = file.read()
+
+        # Remove the temporary XML file
+        os.remove(xml_file_path)
+
+        # Return XML content and message
+        return render_template('validate.html', message=validation_result, xml_content=xml_content)
+    
+
     except etree.XMLSyntaxError as e:
         validation_result = f'XML Syntax Error: {str(e)}'
+   
     except etree.DocumentInvalid as e:
         validation_result = f'Document Invalid: {str(e)}'
+
     except Exception as e:
         validation_result = str(e)
     finally:
-        # Remove the temporary XML file
-        os.remove(xml_file_path) 
-
-    return render_template('validate.html', message=validation_result)
-
-
+        if os.path.exists(xml_file_path):
+            os.remove(xml_file_path)
+            
+    return render_template('validate.html',message=validation_result )
 @app.route('/download')
 def download():
     try:
