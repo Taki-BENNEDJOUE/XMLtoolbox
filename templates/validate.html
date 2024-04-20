@@ -34,17 +34,47 @@
         <div id="validation_result">
             {% if message %}
                 <p>{{ message }}</p>
-            {% endif %}
+            {% endif %}  
         </div>
-        {% if xml_content %}
-        <div id="xml_content_display">
-            <h2>XML Content:</h2>
-            <p>Title: {{ xml_content.title }}</p>
-            <p>Author: {{ xml_content.author }}</p>
-            <p>ISBN: {{ xml_content.isbn }}</p>
-            <p>Publication Year: {{ xml_content.publication_year }}</p>
-        </div>
-        {% endif %}
     </div>
+    <div id="transformed-content"></div>
+
+    <script>
+        function transformXML() {
+            // Get the selected file
+            var fileInput = document.getElementById('xml_file');
+            var file = fileInput.files[0];
+
+            // Check if a file is selected
+            if (!file) {
+                alert('Please select an XML file.');
+                return false;
+            }
+
+            // Read the file content
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var xmlContent = event.target.result;
+
+                // Transform XML to HTML using XSLT.js
+                var xsltProcessor = new XSLTProcessor();
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', "{{ url_for('static', filename='transform.xslt') }}", true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var xsltDoc = xhr.responseXML;
+                        xsltProcessor.importStylesheet(xsltDoc);
+                        var resultDocument = xsltProcessor.transformToDocument(new DOMParser().parseFromString(xmlContent, 'text/xml'));
+                        var transformedHTML = new XMLSerializer().serializeToString(resultDocument);
+                        document.getElementById('transformed-content').innerHTML = transformedHTML;
+                    }
+                };
+                xhr.send();
+            };
+            reader.readAsText(file);
+
+            return false; // Prevent the form from submitting
+        }
+    </script>
 </body>
 </html>

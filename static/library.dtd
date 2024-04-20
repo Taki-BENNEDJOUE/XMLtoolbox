@@ -1,6 +1,13 @@
 <!ELEMENT library (book+)>
-<!ELEMENT book (title,author,isbn,publication_year)>
+<!ELEMENT book (title, author, isbn, publication_year, publisher, genre, reviews)>
+<!ATTLIST book id ID #REQUIRED>
 <!ELEMENT title (#PCDATA)>
 <!ELEMENT author (#PCDATA)>
 <!ELEMENT isbn (#PCDATA)>
 <!ELEMENT publication_year (#PCDATA)>
+<!ELEMENT publisher (#PCDATA)>
+<!ELEMENT genre (#PCDATA)>
+<!ELEMENT reviews (review+)>
+<!ELEMENT review (rating, comment)>
+<!ELEMENT rating (#PCDATA)>
+<!ELEMENT comment (#PCDATA)>

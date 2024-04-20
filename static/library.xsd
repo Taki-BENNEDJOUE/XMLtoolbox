@@ -1,5 +1,4 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
   <xs:element name="library">
     <xs:complexType>
       <xs:sequence>
@@ -37,11 +36,55 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+              <xs:element name="publisher">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="2"/>
+                    <xs:maxLength value="100"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="genre">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="2"/>
+                    <xs:maxLength value="50"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="reviews">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="review" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="rating">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:positiveInteger">
+                                <xs:minInclusive value="1"/>
+                                <xs:maxInclusive value="5"/>
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="comment">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:minLength value="5"/>
+                                <xs:maxLength value="500"/>
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
             </xs:sequence>
+            <xs:attribute name="id" type="xs:string" use="required"/>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-
 </xs:schema>

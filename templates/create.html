@@ -31,12 +31,23 @@
         <label for="publication_year">Publication Year:</label>
         <input type="text" id="publication_year" name="publication_year" required><br>
 
+        <!-- New fields for additional information -->
+        <label for="publisher">Publisher:</label>
+        <input type="text" id="publisher" name="publisher" required><br>
+
+        <label for="genre">Genre:</label>
+        <input type="text" id="genre" name="genre" required><br>
+
+        <!-- Subchild for reviews -->
+        <h2>Reviews</h2>
+        <label for="rating">Rating:</label>
+        <input type="number" id="rating" name="rating" min="1" max="5" required><br>
+
+        <label for="comment">Comment:</label>
+        <textarea id="comment" name="comment" required></textarea><br>
+
         <button type="submit">Add Book</button>
         <a href="/download" class="download">Download XML File</a>
     </form>
-    
-
-    
-    
 </body>
 </html>

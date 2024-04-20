@@ -2,32 +2,11 @@ from flask import Flask, render_template, request, Response
 import xml.etree.ElementTree as ET
 from lxml import etree 
 import os
+import uuid
+
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-def parse_xml_content(xml_content):
-    try:
-        # Find the index of each tag and extract the content between them
-        title_start = xml_content.find('<title>') + len('<title>')
-        title_end = xml_content.find('</title>')
-        title = xml_content[title_start:title_end].strip()
-
-        author_start = xml_content.find('<author>') + len('<author>')
-        author_end = xml_content.find('</author>')
-        author = xml_content[author_start:author_end].strip()
-
-        isbn_start = xml_content.find('<isbn>') + len('<isbn>')
-        isbn_end = xml_content.find('</isbn>')
-        isbn = xml_content[isbn_start:isbn_end].strip()
-
-        pub_year_start = xml_content.find('<publication_year>') + len('<publication_year>')
-        pub_year_end = xml_content.find('</publication_year>')
-        pub_year = xml_content[pub_year_start:pub_year_end].strip()
-
-        return {'title': title, 'author': author, 'isbn': isbn, 'publication_year': pub_year}
-    except Exception as e:
-        print(str(e))
-        return None
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -39,9 +18,14 @@ def create_xml():
         author = request.form['author']
         isbn = request.form['isbn']
         publication_year = request.form['publication_year']
+        publisher = request.form['publisher']  # Get publisher from form
+        genre = request.form['genre']  # Get genre from form
+
+        # Generate unique ID for the book
+        book_id = str(uuid.uuid4())
 
         # Create XML element for the book
-        book_element = ET.Element('book')
+        book_element = ET.Element('book', attrib={'id': book_id})
         title_element = ET.SubElement(book_element, 'title')
         title_element.text = title
         author_element = ET.SubElement(book_element, 'author')
@@ -50,6 +34,18 @@ def create_xml():
         isbn_element.text = isbn
         publication_year_element = ET.SubElement(book_element, 'publication_year')
         publication_year_element.text = publication_year
+        publisher_element = ET.SubElement(book_element, 'publisher')  # Add publisher element
+        publisher_element.text = publisher  # Set text of publisher element
+        genre_element = ET.SubElement(book_element, 'genre')  # Add genre element
+        genre_element.text = genre  # Set text of genre element
+
+        # Add reviews subchild
+        reviews_element = ET.SubElement(book_element, 'reviews')
+        review_element = ET.SubElement(reviews_element, 'review')
+        rating_element = ET.SubElement(review_element, 'rating')
+        rating_element.text = request.form['rating']
+        comment_element = ET.SubElement(review_element, 'comment')
+        comment_element.text = request.form['comment']
 
         # Load existing XML file or create a new one
         root = ET.Element('library')
@@ -71,8 +67,7 @@ def create_xml():
 
 @app.route('/validate_xml')
 def validate_xml():
-    return render_template('validate.html',message=None, parsed_content=None)
-
+    return render_template('validate.html',message=None)
 @app.route('/validate_xml', methods=['POST'])
 def validate():
     # Get uploaded XML file and validation method from the form
@@ -93,29 +88,33 @@ def validate():
         elif validation_method == 'dtd':
             schema_file_path = os.path.join(app.root_path, 'static', 'library.dtd')
             schema = etree.DTD(open(schema_file_path))
-            
-          
 
         # Validate the XML file against the schema
-        schema.assertValid(xml_tree)
-        validation_result = 'XML file is valid.'
-        with open(xml_file_path, 'r') as f:
-            xml_content = f.read()
-        parsed_content = parse_xml_content(xml_content)
+        validation_result = schema.validate(xml_tree)
+        if validation_result:
+            # Transformation only if XML is valid
+            xslt_file_path = os.path.join(app.root_path, 'static', 'transform.xslt')
+            with open(xslt_file_path, 'rb') as f:
+                xslt_content = f.read()
+            transformed_html = transform_xml(xml_file.read(), xslt_content)
+            return transformed_html
+        else:
+            # If XML is not valid, return error message
+            validation_errors = schema.error_log.filter_from_errors()
+            error_message = "\n".join([error.message for error in validation_errors])
+            return f"XML file is not valid. Errors: {error_message}"
     except etree.XMLSyntaxError as e:
         validation_result = f'XML Syntax Error: {str(e)}'
-        parsed_content = None
     except etree.DocumentInvalid as e:
         validation_result = f'Document Invalid: {str(e)}'
-        parsed_content = None
     except Exception as e:
         validation_result = str(e)
-        parsed_content = None
     finally:
-    # Remove the temporary XML file
-        os.remove(xml_file_path)
+        # Remove the temporary XML file
+        os.remove(xml_file_path) 
 
-    return render_template('validate.html',message=validation_result, xml_content = parsed_content)
+    return render_template('validate.html', message=validation_result)
+
 
 @app.route('/download')
 def download():
